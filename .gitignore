@@ -4,3 +4,11 @@ elm-stuff/
 repl-temp-*
 
 elm.js
+
+05/node_modules/
+
+05/package-lock\.json
+
+05/elm-package\.json
+
+05/bundle\.js
