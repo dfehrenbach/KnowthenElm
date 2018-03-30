@@ -205,19 +205,19 @@ playerList : Model -> Html Msg
 playerList model =
     model.players
         |> List.sortBy .name
-        |> List.map player
+        |> List.map (player model.playerId)
         |> ul []
 
 
-player : Player -> Html Msg
-player player =
+player : Maybe Int -> Player -> Html Msg
+player editPlayerId player =
     li []
         [ i
             [ class "edit"
             , onClick (Edit player)
             ]
             []
-        , div []
+        , div [ class (editPlayerClass editPlayerId player) ]
             [ text player.name ]
         , button
             [ type_ "button"
@@ -232,6 +232,19 @@ player player =
         , div []
             [ text (toString player.points) ]
         ]
+
+
+editPlayerClass : Maybe Int -> Player -> String
+editPlayerClass editPlayerId player =
+    case editPlayerId of
+        Just id ->
+            if player.id == id then
+                "edit"
+            else
+                ""
+
+        Nothing ->
+            ""
 
 
 pointTotal : Model -> Html Msg
@@ -265,11 +278,22 @@ playerForm model =
             , placeholder "Add/Edit Player..."
             , onInput Input
             , value model.name
+            , class (editPlayerFormClass model.playerId)
             ]
             []
         , button [ type_ "submit" ] [ text "Save" ]
         , button [ type_ "button", onClick Cancel ] [ text "Cancel" ]
         ]
+
+
+editPlayerFormClass : Maybe Int -> String
+editPlayerFormClass editPlayerId =
+    case editPlayerId of
+        Just id ->
+            "edit"
+
+        Nothing ->
+            ""
 
 
 playListHeader : Html Msg
