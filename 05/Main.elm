@@ -124,8 +124,39 @@ update msg model =
         Cancel ->
             { model | name = "", playerId = Nothing }
 
+        Score player points ->
+            score model player points
+
+        Edit player ->
+            { model
+                | name = player.name
+                , playerId = Just player.id
+            }
+
         _ ->
             model
+
+
+score : Model -> Player -> Int -> Model
+score model scorer points =
+    let
+        newPlayers =
+            model.players
+                |> List.map
+                    (\player ->
+                        if player.id == scorer.id then
+                            { player | points = player.points + points }
+                        else
+                            player
+                    )
+
+        play =
+            Play (List.length model.plays) scorer.id scorer.name points
+    in
+        { model
+            | players = newPlayers
+            , plays = play :: model.plays
+        }
 
 
 
