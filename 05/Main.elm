@@ -133,8 +133,28 @@ update msg model =
                 , playerId = Just player.id
             }
 
-        _ ->
-            model
+        DeletePlay play ->
+            deletePlay model play
+
+
+deletePlay : Model -> Play -> Model
+deletePlay model play =
+    let
+        newPlays =
+            model.plays
+                |> List.filter (\p -> p.id /= play.id)
+
+        newPlayers =
+            model.players
+                |> List.map
+                    (\player ->
+                        if player.id == play.playerId then
+                            { player | points = player.points - play.points }
+                        else
+                            player
+                    )
+    in
+        { model | plays = newPlays, players = newPlayers }
 
 
 score : Model -> Player -> Int -> Model
@@ -169,7 +189,7 @@ view model =
         [ h1 [] [ text "score Keeper" ]
         , playerSection model
         , playerForm model
-        , p [] [ text (toString model) ]
+        , playSection model
         ]
 
 
@@ -249,6 +269,42 @@ playerForm model =
             []
         , button [ type_ "submit" ] [ text "Save" ]
         , button [ type_ "button", onClick Cancel ] [ text "Cancel" ]
+        ]
+
+
+playListHeader : Html Msg
+playListHeader =
+    header []
+        [ div [] [ text "Plays" ]
+        , div [] [ text "Points" ]
+        ]
+
+
+playList : Model -> Html Msg
+playList model =
+    model.plays
+        |> List.map play
+        |> ul []
+
+
+play : Play -> Html Msg
+play play =
+    li []
+        [ i
+            [ class "remove"
+            , onClick (DeletePlay play)
+            ]
+            []
+        , div [] [ text play.name ]
+        , div [] [ text (toString play.points) ]
+        ]
+
+
+playSection : Model -> Html Msg
+playSection model =
+    div []
+        [ playListHeader
+        , playList model
         ]
 
 
